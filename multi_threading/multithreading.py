@@ -1,8 +1,13 @@
 import random
 import threading
+import time
+from threading import Event
 from threading import local
 
 
+# Stack size, timeout, thread local data
+# Thread object
+# Daemon -> Event
 # TODO: for exchanging data between threads, use queue module
 # https://docs.python.org/3/library/queue.html#module-queue
 
@@ -22,19 +27,23 @@ class ThreadOneLocal(local):
                 print(f"Thread 1 - sending value: {current_random}")
                 self.next_to_send = False
             else:
-                print("Thread 1 - next iteration")
+                print(f"Thread 1 - next iteration with: {current_random}")
 
 
-def execute_thread_local(local: ThreadOneLocal):
-    local.update()
+def execute_thread_local(local: ThreadOneLocal, stop_event: Event):
+    while not stop_event.is_set():
+        time.sleep(1)
+        local.update()
 
 
 def main():
     print("Starting data exchange..")
-    localOne: ThreadOneLocal = ThreadOneLocal()
-    thread = threading.Thread(target=execute_thread_local(localOne))
+    stop_event = Event()
+    thread = threading.Thread(target=execute_thread_local(ThreadOneLocal(), stop_event))
     thread.start()
     thread.join()
+    # How to stop the thread gracefully?
+    stop_event.set()
 
 
 main()
