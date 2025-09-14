@@ -1,0 +1,20 @@
+Thread #1
+Function: Generates a random natural number in the range [1; 6] every 1000 ms.
+Behavior:
+If the generated number equals 3, the thread passes the next generated number to Thread #2.
+Thread #2
+Function: Generates a random natural number from the set {10, 20, 30} every 1333 ms.
+Behavior:
+Displays on screen the sum of the generated number and the last number received from Thread #1.
+Upon receiving a number from Thread #1, the current sum is:
+Sent to Thread #3.
+Displayed on the screen.
+Thread #3
+Function: Buffers numbers received from Thread #2 in the order of arrival.
+Behavior:
+Outputs buffered numbers to the screen when any of the following conditions is met (indicating the triggered condition).
+After output, the buffer is cleared.
+Output conditions:
+The buffer contains 5 numbers.
+The sum of buffered numbers exceeds 117.
+More than 30 seconds have elapsed since the first number was added to the current buffer.д
