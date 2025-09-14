@@ -11,7 +11,7 @@ from threading import local
 # TODO: for exchanging data between threads, use queue module
 # https://docs.python.org/3/library/queue.html#module-queue
 
-class ThreadOneLocal(local):
+class OneThreadLocal(local):
     next_to_send: bool = False
 
     def __init__(self):
@@ -30,7 +30,7 @@ class ThreadOneLocal(local):
                 print(f"Thread 1 - next iteration with: {current_random}")
 
 
-def execute_thread_local(local: ThreadOneLocal, stop_event: Event):
+def one_execute_thread_local(local: OneThreadLocal, stop_event: Event):
     while not stop_event.is_set():
         time.sleep(1)
         local.update()
@@ -39,7 +39,7 @@ def execute_thread_local(local: ThreadOneLocal, stop_event: Event):
 def main():
     print("Starting data exchange..")
     stop_event = Event()
-    thread = threading.Thread(target=execute_thread_local(ThreadOneLocal(), stop_event))
+    thread = threading.Thread(target=one_execute_thread_local(OneThreadLocal(), stop_event))
     thread.start()
     thread.join()
     # How to stop the thread gracefully?
