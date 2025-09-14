@@ -41,16 +41,14 @@ def one_execute_thread_local(local: OneThreadLocal, stop_event: Event):
 
 class TwoThreadLocal(local):
 
-    def __init__(self, queue: Queue):
-        self._queue = queue
+    def __init__(self, queue_from_one: Queue, queue_to_three: Queue):
+        self._queue_from_one = queue_from_one
+        self._queue_to_three = queue_to_three
         self._last_from_queue = None
         self._sum = None
         super().__init__()
 
     def update(self):
-        if not self._queue.empty():
-            self._last_from_queue = self._queue.get_nowait()
-
         current_random = random.choice([10, 20, 30])
         print("Thread 2 actual generated value:", current_random)
 
@@ -59,6 +57,12 @@ class TwoThreadLocal(local):
         else:
             self._sum = current_random + self._last_from_queue
             print("Thread 2 actual sum:", self._sum)
+
+        if not self._queue_from_one.empty():
+            self._last_from_queue = self._queue_from_one.get_nowait()
+            sum_to_send = current_random + self._last_from_queue
+            self._queue_to_three.put_nowait(sum_to_send)
+            print("Thread 2 sent sum to Thread 3 :", self._sum)
 
 
 def two_execute_thread_local(local: TwoThreadLocal, stop_event: Event):
@@ -70,10 +74,12 @@ def two_execute_thread_local(local: TwoThreadLocal, stop_event: Event):
 class ThreeThreadLocal(local):
     buffer = list()
 
-    def __init__(self):
+    def __init__(self, queue_from_two: Queue):
+        self._queue_from_two = queue_from_two
         super().__init__()
 
     def update(self):
+        # Queue to three can be as buffer
         print("Thread 3 buffer:", self.buffer)
 
 
@@ -86,10 +92,18 @@ def three_execute_thread_local(local: ThreeThreadLocal, stop_event: Event):
 def main():
     print("Starting data exchange..")
     stop_event = Event()
-    queue = Queue()
-    one_thread = threading.Thread(target=one_execute_thread_local, args=(OneThreadLocal(queue), stop_event))
-    two_thread = threading.Thread(target=two_execute_thread_local, args=(TwoThreadLocal(queue), stop_event))
-    three_thread = threading.Thread(target=two_execute_thread_local, args=(ThreeThreadLocal(), stop_event))
+    queue_one_and_two = Queue()
+    queue_two_and_three = Queue()
+    one_thread = (
+        threading.Thread(target=one_execute_thread_local, args=(OneThreadLocal(queue_one_and_two), stop_event)))
+    two_thread = (
+        threading.Thread(
+            target=two_execute_thread_local,
+            args=(TwoThreadLocal(queue_one_and_two, queue_two_and_three), stop_event)
+        )
+    )
+    three_thread = (
+        threading.Thread(target=two_execute_thread_local, args=(ThreeThreadLocal(queue_two_and_three), stop_event)))
 
     one_thread.start()
     two_thread.start()
