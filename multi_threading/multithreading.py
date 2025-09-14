@@ -36,14 +36,34 @@ def one_execute_thread_local(local: OneThreadLocal, stop_event: Event):
         local.update()
 
 
+class TwoThreadLocal(local):
+
+    def __init__(self):
+        super().__init__()
+
+    def update(self):
+        current_random = random.choice([10, 20, 30])
+        print("Thread 2: generated value:", current_random)
+
+
+def two_execute_thread_local(local: TwoThreadLocal, stop_event: Event):
+    while not stop_event.is_set():
+        time.sleep(1333 / 1000)
+        local.update()
+
+
 def main():
     print("Starting data exchange..")
-    stop_event = Event()
-    thread = threading.Thread(target=one_execute_thread_local(OneThreadLocal(), stop_event))
-    thread.start()
-    thread.join()
-    # How to stop the thread gracefully?
-    stop_event.set()
-
+    one_stop_event = Event()
+    one_thread = threading.Thread(target=one_execute_thread_local, args=(OneThreadLocal(), one_stop_event))
+    one_thread.start()
+    one_thread.join()
+    # TODO: How to stop the thread gracefully?
+    one_stop_event.set()
+    two_stop_event = Event()
+    two_thread = threading.Thread(target=two_execute_thread_local, args=(TwoThreadLocal(), two_stop_event))
+    two_thread.start()
+    two_thread.join()
+    two_stop_event.set()
 
 main()
