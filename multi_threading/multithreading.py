@@ -56,14 +56,17 @@ def main():
     print("Starting data exchange..")
     one_stop_event = Event()
     one_thread = threading.Thread(target=one_execute_thread_local, args=(OneThreadLocal(), one_stop_event))
-    one_thread.start()
-    one_thread.join()
     # TODO: How to stop the thread gracefully?
-    one_stop_event.set()
     two_stop_event = Event()
     two_thread = threading.Thread(target=two_execute_thread_local, args=(TwoThreadLocal(), two_stop_event))
+
+    one_thread.start()
     two_thread.start()
+
+    one_thread.join()
     two_thread.join()
+
+    one_stop_event.set()
     two_stop_event.set()
 
 main()
