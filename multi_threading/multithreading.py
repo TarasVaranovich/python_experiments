@@ -43,16 +43,22 @@ class TwoThreadLocal(local):
 
     def __init__(self, queue: Queue):
         self._queue = queue
+        self._last_from_queue = None
+        self._sum = None
         super().__init__()
 
     def update(self):
+        if not self._queue.empty():
+            self._last_from_queue = self._queue.get_nowait()
+
         current_random = random.choice([10, 20, 30])
-        if self._queue.empty():
-            print("Thread 2: queue is empty, waiting for value")
+        print("Thread 2 actual generated value:", current_random)
+
+        if self._last_from_queue is None:
+            print("Thread 2 - queue is empty, waiting for value")
         else:
-            last_from_queue = self._queue.get_nowait()
-            print("Thread 2: generated value:", current_random)
-            print("Thread 2: sum:", current_random + last_from_queue)
+            self._sum = current_random + self._last_from_queue
+            print("Thread 2 actual sum:", self._sum)
 
 
 def two_execute_thread_local(local: TwoThreadLocal, stop_event: Event):
