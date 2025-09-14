@@ -24,10 +24,10 @@ class OneThreadLocal(local):
             self.next_to_send = True
         else:
             if self.next_to_send:
-                print(f"Thread 1 - sending value: {current_random}")
+                print("Thread 1 - sending value:", current_random)
                 self.next_to_send = False
             else:
-                print(f"Thread 1 - next iteration with: {current_random}")
+                print(f"Thread 1 - next iteration with:", current_random)
 
 
 def one_execute_thread_local(local: OneThreadLocal, stop_event: Event):
@@ -52,21 +52,39 @@ def two_execute_thread_local(local: TwoThreadLocal, stop_event: Event):
         local.update()
 
 
+class ThreeThreadLocal(local):
+    buffer = list()
+
+    def __init__(self):
+        super().__init__()
+
+    def update(self):
+        print("Thread 3 buffer:", self.buffer)
+
+
+def three_execute_thread_local(local: ThreeThreadLocal, stop_event: Event):
+    while not stop_event.is_set():
+        time.sleep(1)
+        local.update()
+
+
 def main():
     print("Starting data exchange..")
-    one_stop_event = Event()
-    one_thread = threading.Thread(target=one_execute_thread_local, args=(OneThreadLocal(), one_stop_event))
-    # TODO: How to stop the thread gracefully?
-    two_stop_event = Event()
-    two_thread = threading.Thread(target=two_execute_thread_local, args=(TwoThreadLocal(), two_stop_event))
+    stop_event = Event()
+    one_thread = threading.Thread(target=one_execute_thread_local, args=(OneThreadLocal(), stop_event))
+    two_thread = threading.Thread(target=two_execute_thread_local, args=(TwoThreadLocal(), stop_event))
+    three_thread = threading.Thread(target=two_execute_thread_local, args=(ThreeThreadLocal(), stop_event))
 
     one_thread.start()
     two_thread.start()
+    three_thread.start()
 
     one_thread.join()
     two_thread.join()
+    three_thread.join()
 
-    one_stop_event.set()
-    two_stop_event.set()
+    stop_event.set()
+    # TODO: How to stop the thread gracefully?
+
 
 main()
