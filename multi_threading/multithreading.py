@@ -1,6 +1,7 @@
 import random
 import threading
 import time
+from asyncio import Queue
 from threading import Event
 from threading import local
 
@@ -12,20 +13,22 @@ from threading import local
 # https://docs.python.org/3/library/queue.html#module-queue
 
 class OneThreadLocal(local):
-    next_to_send: bool = False
 
-    def __init__(self):
+    def __init__(self, queue: Queue):
+        self._next_to_send = False
+        self._queue = queue
         super().__init__()
 
     def update(self):
         current_random = random.randint(1, 6)
-        if current_random == 3 and not self.next_to_send:
+        if current_random == 3 and not self._next_to_send:
             print("Thread 1: tigger next value to sent")
-            self.next_to_send = True
+            self._next_to_send = True
         else:
-            if self.next_to_send:
+            if self._next_to_send:
                 print("Thread 1 - sending value:", current_random)
-                self.next_to_send = False
+                self._queue.put_nowait(current_random)
+                self._next_to_send = False
             else:
                 print(f"Thread 1 - next iteration with:", current_random)
 
@@ -38,12 +41,18 @@ def one_execute_thread_local(local: OneThreadLocal, stop_event: Event):
 
 class TwoThreadLocal(local):
 
-    def __init__(self):
+    def __init__(self, queue: Queue):
+        self._queue = queue
         super().__init__()
 
     def update(self):
         current_random = random.choice([10, 20, 30])
-        print("Thread 2: generated value:", current_random)
+        if self._queue.empty():
+            print("Thread 2: queue is empty, waiting for value")
+        else:
+            last_from_queue = self._queue.get_nowait()
+            print("Thread 2: generated value:", current_random)
+            print("Thread 2: sum:", current_random + last_from_queue)
 
 
 def two_execute_thread_local(local: TwoThreadLocal, stop_event: Event):
@@ -71,20 +80,22 @@ def three_execute_thread_local(local: ThreeThreadLocal, stop_event: Event):
 def main():
     print("Starting data exchange..")
     stop_event = Event()
-    one_thread = threading.Thread(target=one_execute_thread_local, args=(OneThreadLocal(), stop_event))
-    two_thread = threading.Thread(target=two_execute_thread_local, args=(TwoThreadLocal(), stop_event))
+    queue = Queue()
+    one_thread = threading.Thread(target=one_execute_thread_local, args=(OneThreadLocal(queue), stop_event))
+    two_thread = threading.Thread(target=two_execute_thread_local, args=(TwoThreadLocal(queue), stop_event))
     three_thread = threading.Thread(target=two_execute_thread_local, args=(ThreeThreadLocal(), stop_event))
 
     one_thread.start()
     two_thread.start()
-    three_thread.start()
+    # three_thread.start()
 
     one_thread.join()
     two_thread.join()
-    three_thread.join()
+    # three_thread.join()
 
     stop_event.set()
     # TODO: How to stop the thread gracefully?
+    # TODO: add with clause to threads
 
 
 main()
