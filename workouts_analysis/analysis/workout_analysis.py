@@ -9,5 +9,4 @@ def main():
     workouts_df.plot.kde()
     plt.savefig("workouts_kde.jpg")
 
-
 main()
