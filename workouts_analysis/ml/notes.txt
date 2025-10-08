@@ -1,0 +1,14 @@
+supervised and unsupervised learning:
+- Supervised learning involves training a model on labeled data,
+where the input features and corresponding output labels are provided.
+The model learns to map inputs to outputs and can make predictions on new, unseen data.
+Common algorithms include
+-linear regression;
+-logistic regression;
+-K-nearest neighbors;
+-decision trees;
+-support vector machines;
+-k-means clustering;
+-and neural networks.
+- Unsupervised learning, on the other hand, deals with unlabeled data.
+The model tries to find patterns, structures, or relationships within the data without predefined labels.

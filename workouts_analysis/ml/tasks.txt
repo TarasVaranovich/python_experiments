@@ -1,0 +1,5 @@
+Predict day of week
+Predict male/or female
+Predict fault
+Predict timestamp
+Recognize address validity
