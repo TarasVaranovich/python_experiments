@@ -81,7 +81,9 @@ class ThreeThreadLocal(local):
     def update(self):
         self._queus_life_span = time.localtime()
         # TODO: how to measure that element arrived ???
-        if self._queue_from_two.qsize() >= 5:
+        if self._queue_from_two.qsize() == 1:
+            self._queus_life_span = time.localtime()
+        elif self._queue_from_two.qsize() >= 5:
             print("Thread 3: buffer has size 5")
             print("Thread 3 - elements:", list(self._queue_from_two.queue))
             self._queue_from_two.queue.clear()
