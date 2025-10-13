@@ -118,7 +118,7 @@ def main():
         )
     )
     three_thread = (
-        threading.Thread(target=two_execute_thread_local, args=(ThreeThreadLocal(queue_two_and_three), stop_event)))
+        threading.Thread(target=three_execute_thread_local, args=(ThreeThreadLocal(queue_two_and_three), stop_event)))
 
     one_thread.start()
     two_thread.start()
