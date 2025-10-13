@@ -1,7 +1,7 @@
 import random
 import threading
 import time
-from asyncio import Queue
+from queue import Queue
 from threading import Event
 from threading import local
 
@@ -74,15 +74,14 @@ def two_execute_thread_local(local: TwoThreadLocal, stop_event: Event):
 class ThreeThreadLocal(local):
 
     def __init__(self, queue_from_two: Queue):
-        self._queus_life_span = time.localtime()
+        self._queus_life_span = time.time()
         self._queue_from_two = queue_from_two
         super().__init__()
 
     def update(self):
-        self._queus_life_span = time.localtime()
-        # TODO: how to measure that element arrived ???
+        self._queus_life_span = time.time()
         if self._queue_from_two.qsize() == 1:
-            self._queus_life_span = time.localtime()
+            self._queus_life_span = time.time()
         elif self._queue_from_two.qsize() >= 5:
             print("Thread 3: buffer has size 5")
             print("Thread 3 - elements:", list(self._queue_from_two.queue))
@@ -93,7 +92,7 @@ class ThreeThreadLocal(local):
             print("Thread 3: sum of elements reached 117")
             print("Thread 3 - elements:", list(self._queue_from_two.queue))
             self._queue_from_two.queue.clear()
-        if (time.localtime() - self._queus_life_span) > 30:
+        if (time.time() - self._queus_life_span) > 30:
             print("Thread 3: first element arrived more than 30 second ago")
             print("Thread 3 - elements:", list(self._queue_from_two.queue))
             self._queue_from_two.queue.clear()
@@ -123,11 +122,11 @@ def main():
 
     one_thread.start()
     two_thread.start()
-    # three_thread.start()
+    three_thread.start()
 
     one_thread.join()
     two_thread.join()
-    # three_thread.join()
+    three_thread.join()
 
     stop_event.set()
     # TODO: How to stop the thread gracefully?
