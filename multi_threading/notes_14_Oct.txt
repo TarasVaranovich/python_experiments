@@ -1,0 +1,9 @@
+Что за local с маленькой буквы ??
+
+Thread class
+Override run () class
+Не наследовать от пересменной local
+Не нужно нужно нследоваться от тредаи оверрайд
+Method init in Thread where to pass queue
+
+Global variable Shutdown = false
