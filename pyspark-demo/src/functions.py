@@ -27,4 +27,4 @@ def reduce_to_accum(accum: list[Product], prev: Product,
   if sum(list(map(lambda x: x.row_size, accum))) > 1000000:
     print(len(accum))
     accum.clear()
-  return Product();
+  return prev;
