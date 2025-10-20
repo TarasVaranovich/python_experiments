@@ -39,6 +39,9 @@ def main():
   max_size = typed_df.max(key=lambda p: p.row_size)
   print("Max row size:")
   print(max_size.row_size)
+  min_size = typed_df.min(key=lambda p: p.row_size)
+  print("Min row size:")
+  print(min_size.row_size)
   spark.stop()
 
 
