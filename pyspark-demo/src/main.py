@@ -13,7 +13,7 @@ def main():
 
     df = spark.read.csv("data/sample.csv", header=True, inferSchema=True)
     df.show(5)
-
+    # Investigate files archiving into avro, parquet, orc etc..
     spark.stop()
 
 if __name__ == "__main__":
