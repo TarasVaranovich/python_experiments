@@ -11,7 +11,7 @@ def main():
     print(f"Spark version: {spark.version}")
     print(f"JAVA_HOME: {os.getenv('JAVA_HOME')}")
 
-    df = spark.read.csv("data/sample.csv", header=True, inferSchema=True)
+    df = spark.read.csv("../data/sample.csv", header=True, inferSchema=True)
     df.show(5)
     # Investigate files archiving into avro, parquet, orc etc..
     spark.stop()
