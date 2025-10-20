@@ -1,0 +1,2 @@
+1. What is DF and RDD ? https://medium.com/@kiranvutukuri/rdds-vs-dataframes-vs-datasets-choosing-the-right-part-11-b12d6969885d
+2. parquet, avro, orc
