@@ -1,0 +1,2 @@
+SOURCE_FILE_PATH = "../data/products-100000.csv"
+BATCH_SIZE = 1000000

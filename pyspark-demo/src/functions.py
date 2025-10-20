@@ -1,5 +1,7 @@
 from Product import Product
 
+from constants import BATCH_SIZE
+
 
 def row_to_product(row):
   return Product(
@@ -20,11 +22,14 @@ def row_to_product(row):
   )
 
 
-def reduce_to_accum(accum: list[Product], prev: Product,
-    next: Product) -> Product:
+def reduce_to_accum(
+    accum: list[Product],
+    prev: Product,
+    next: Product
+) -> Product:
   accum.append(prev)
   accum.append(next)
-  if sum(list(map(lambda x: x.row_size, accum))) > 1000000:
+  if sum(list(map(lambda x: x.row_size, accum))) > BATCH_SIZE:
     print(len(accum))
     accum.clear()
-  return prev;
+  return prev

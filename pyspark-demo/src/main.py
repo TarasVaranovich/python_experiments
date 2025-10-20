@@ -5,6 +5,7 @@ from pyspark.sql.functions import udf
 from pyspark.sql.types import LongType
 
 from Product import Product
+from constants import SOURCE_FILE_PATH
 from functions import reduce_to_accum
 from functions import row_to_product
 
@@ -25,8 +26,7 @@ def main():
   print(f"Spark version: {spark.version}")
   print(f"JAVA_HOME: {os.getenv('JAVA_HOME')}")
 
-  df = spark.read.csv("../data/products-100000.csv", header=True,
-                      inferSchema=True)
+  df = spark.read.csv(SOURCE_FILE_PATH, header=True, inferSchema=True)
   row_size_udf = udf(row_size, LongType())
   df_with_size = df.withColumn("row_size", row_size_udf(*df.columns))
   print("Enriched with row size:")
