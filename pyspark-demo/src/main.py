@@ -1,0 +1,20 @@
+from pyspark.sql import SparkSession
+import os
+
+def main():
+    spark = (
+        SparkSession.builder
+        .appName("PySpark Demo")
+        .getOrCreate()
+    )
+
+    print(f"Spark version: {spark.version}")
+    print(f"JAVA_HOME: {os.getenv('JAVA_HOME')}")
+
+    df = spark.read.csv("data/sample.csv", header=True, inferSchema=True)
+    df.show(5)
+
+    spark.stop()
+
+if __name__ == "__main__":
+    main()
