@@ -40,6 +40,10 @@ class Product:
     return self.__name
 
   @property
+  def description(self) -> str:
+    return self.__name
+
+  @property
   def brand(self) -> str:
     return self.__brand
 
