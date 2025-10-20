@@ -4,6 +4,7 @@ import io
 from Product import Product
 from constants import BATCH_SIZE
 from constants import DESTINATION_DIR
+from constants import FILE_BUFF
 
 
 def row_to_product(row):
@@ -25,6 +26,10 @@ def row_to_product(row):
   )
 
 
+def row_size(*cols):
+  return sum([len(str(c).encode('utf-8')) for c in cols])
+
+
 def product_to_csv(product: Product) -> str:
   output = io.StringIO()
   writer = csv.writer(output)
@@ -43,10 +48,10 @@ def product_to_csv(product: Product) -> str:
     product.availability,
     product.internal_id
   ])
-  return output.getvalue().rstrip('\r\n')
+  return output.getvalue()
 
 
-def reduce_to_accum(
+def write_batches(
     batch_counter: int,
     accum: list[Product],
     prev: Product,
@@ -57,7 +62,7 @@ def reduce_to_accum(
   if sum(list(map(lambda x: x.row_size, accum))) > BATCH_SIZE:
     print(len(accum))
     batch_counter = batch_counter + 1
-    with open(f"{DESTINATION_DIR}_{batch_counter}.csv", "wt", 8192) as f:
+    with open(f"{DESTINATION_DIR}_{batch_counter}.csv", "wt", FILE_BUFF) as f:
       for row in accum:
         f.write(product_to_csv(row))
       f.close()

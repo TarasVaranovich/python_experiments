@@ -6,18 +6,9 @@ from pyspark.sql.types import LongType
 
 from Product import Product
 from constants import SOURCE_FILE_PATH
-from functions import reduce_to_accum
+from functions import row_size
 from functions import row_to_product
-
-
-def row_size(*cols):
-  return sum([len(str(c).encode('utf-8')) for c in cols])
-
-
-# def merge(acc: list[Product], entry: Product):
-#   count = acc.count + 1
-#   sum = acc.sum + x
-#   return struct(count.alias("count"), sum.alias("sum"))
+from functions import write_batches
 
 
 def main():
@@ -43,7 +34,9 @@ def main():
   accum: list[Product] = []
   batch_counter: int = 0
   typed_df.reduce(
-    lambda prev, next: reduce_to_accum(batch_counter, accum, prev, next))
+      lambda prev, next:
+      write_batches(batch_counter, accum, prev, next)
+  )
   spark.stop()
 
 
