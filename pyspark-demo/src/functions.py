@@ -18,3 +18,13 @@ def row_to_product(row):
       row['Internal ID'],
       row['row_size']
   )
+
+
+def reduce_to_accum(accum: list[Product], prev: Product,
+    next: Product) -> Product:
+  accum.append(prev)
+  accum.append(next)
+  if sum(list(map(lambda x: x.row_size, accum))) > 1000000:
+    print(len(accum))
+    accum.clear()
+  return Product();

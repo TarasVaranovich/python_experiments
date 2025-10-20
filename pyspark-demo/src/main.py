@@ -4,6 +4,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import LongType
 
+from Product import Product
+from functions import reduce_to_accum
 from functions import row_to_product
 
 
@@ -18,11 +20,7 @@ def row_size(*cols):
 
 
 def main():
-  spark = (
-    SparkSession.builder
-    .appName("PySpark Demo")
-    .getOrCreate()
-  )
+  spark = SparkSession.builder.appName("PySpark Demo").getOrCreate()
 
   print(f"Spark version: {spark.version}")
   print(f"JAVA_HOME: {os.getenv('JAVA_HOME')}")
@@ -42,6 +40,8 @@ def main():
   min_size = typed_df.min(key=lambda p: p.row_size)
   print("Min row size:")
   print(min_size.row_size)
+  accum: list[Product] = []
+  typed_df.reduce(lambda prev, next: reduce_to_accum(accum, prev, next))
   spark.stop()
 
 
