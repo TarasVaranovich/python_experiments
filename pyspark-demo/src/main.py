@@ -1,7 +1,7 @@
 import os
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf, struct
+from pyspark.sql.functions import udf
 from pyspark.sql.types import LongType
 
 from functions import row_to_product
@@ -11,10 +11,10 @@ def row_size(*cols):
   return sum([len(str(c).encode('utf-8')) for c in cols])
 
 
-def merge(acc, x):
-  count = acc.count + 1
-  sum = acc.sum + x
-  return struct(count.alias("count"), sum.alias("sum"))
+# def merge(acc: list[Product], entry: Product):
+#   count = acc.count + 1
+#   sum = acc.sum + x
+#   return struct(count.alias("count"), sum.alias("sum"))
 
 
 def main():
@@ -36,6 +36,9 @@ def main():
   typed_df = df_with_size.rdd.map(lambda row: row_to_product(row))
   print("Converted into class - columns in unexpected order:")
   typed_df.toDF().show()
+  max_size = typed_df.max(key=lambda p: p.row_size)
+  print("Max row size:")
+  print(max_size.row_size)
   spark.stop()
 
 
