@@ -32,10 +32,9 @@ def main():
   print("Min row size:")
   print(min_size.row_size)
   accum: list[Product] = []
-  batch_counter: int = 0
   typed_df.reduce(
       lambda prev, next:
-      write_batches(batch_counter, accum, prev, next)
+      write_batches(accum, prev, next)
   )
   spark.stop()
 

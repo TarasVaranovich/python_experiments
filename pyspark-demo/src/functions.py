@@ -1,5 +1,6 @@
 import csv
 import io
+import time
 
 from Product import Product
 from constants import BATCH_SIZE
@@ -52,7 +53,6 @@ def product_to_csv(product: Product) -> str:
 
 
 def write_batches(
-    batch_counter: int,
     accum: list[Product],
     prev: Product,
     next: Product
@@ -60,14 +60,13 @@ def write_batches(
   accum.append(prev)
   accum.append(next)
   if sum(list(map(lambda x: x.row_size, accum))) > BATCH_SIZE:
-    print(len(accum))
-    batch_counter = batch_counter + 1
     f_size = sum(list(map(lambda x: x.row_size, accum)))
     with open(
-        f"{DESTINATION_DIR}_{batch_counter}_{f_size}.csv", "wt", FILE_BUFF
+        f"{DESTINATION_DIR}batch_size_{f_size}_{time.time_ns()}.csv", "wt", FILE_BUFF
     ) as f:
       for row in accum:
         f.write(product_to_csv(row))
       f.close()
+      print(f"Written file size:{f_size}")
     accum.clear()
   return prev
