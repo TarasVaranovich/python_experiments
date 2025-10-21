@@ -62,7 +62,10 @@ def write_batches(
   if sum(list(map(lambda x: x.row_size, accum))) > BATCH_SIZE:
     print(len(accum))
     batch_counter = batch_counter + 1
-    with open(f"{DESTINATION_DIR}_{batch_counter}.csv", "wt", FILE_BUFF) as f:
+    f_size = sum(list(map(lambda x: x.row_size, accum)))
+    with open(
+        f"{DESTINATION_DIR}_{batch_counter}_{f_size}.csv", "wt", FILE_BUFF
+    ) as f:
       for row in accum:
         f.write(product_to_csv(row))
       f.close()
