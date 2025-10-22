@@ -54,19 +54,17 @@ def product_to_csv(product: Product) -> str:
 
 def write_batches(
     accum: list[Product],
-    prev: Product,
-    next: Product
-) -> Product:
-  accum.append(prev)
-  accum.append(next)
+    elem: Product
+) -> None:
+  accum.append(elem)
   if sum(list(map(lambda x: x.row_size, accum))) > BATCH_SIZE:
     f_size = sum(list(map(lambda x: x.row_size, accum)))
     with open(
-        f"{DESTINATION_DIR}batch_size_{f_size}_{time.time_ns()}.csv", "wt", FILE_BUFF
+        f"{DESTINATION_DIR}batch_size_{f_size}_{time.time_ns()}.csv", "wt",
+        FILE_BUFF
     ) as f:
       for row in accum:
         f.write(product_to_csv(row))
       f.close()
       print(f"Written file size:{f_size}")
     accum.clear()
-  return prev

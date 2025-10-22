@@ -32,9 +32,9 @@ def main():
   print("Min row size:")
   print(min_size.row_size)
   accum: list[Product] = []
-  typed_df.reduce(
-      lambda prev, next:
-      write_batches(accum, prev, next)
+  typed_df.foreach(
+      lambda element:
+      write_batches(accum, element)
   )
   spark.stop()
 
